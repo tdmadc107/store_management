@@ -9,6 +9,8 @@ import org.production.common.StoreManagementUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -21,7 +23,8 @@ public class RegisterDailyRevenueService {
     @Autowired
     private final StoreManagementUtils storeManagementUtils;
 
-    public void execute(Workbook workbook, Map<String, String> data, String fileDir, String sheetName) throws IOException {
+    public void execute(Component component, Workbook workbook, Map<String, String> data, String fileDir,
+                        String sheetName) throws IOException {
         int rowIndex = 0;
 
         Sheet sheet = workbook.getSheetAt(0);
@@ -50,5 +53,6 @@ public class RegisterDailyRevenueService {
         }
         sheet.protectSheet("admin");
         storeManagementUtils.writeFile(workbook, fileDir);
+        JOptionPane.showMessageDialog(component, "Nhập doanh thu thành công");
     }
 }

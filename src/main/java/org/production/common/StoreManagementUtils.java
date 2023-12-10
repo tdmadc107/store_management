@@ -20,13 +20,14 @@ import static org.production.common.Constant.*;
 @Data
 public class StoreManagementUtils {
 
-    public FileInputStream openFile(String fileDir) throws FileNotFoundException {
+    public FileInputStream openFile(String fileName) throws FileNotFoundException {
 
-        File filePath = new File(LOCATION_FILE_REVENUE.concat(formatterYYYYMM(CURRENT_DATE)).concat("/"));
+        String fileDir = LOCATION_FILE_REVENUE.concat(formatterYYYYMM(CURRENT_DATE)).concat("/");
+        File filePath = new File(fileDir);
         if (!filePath.exists()) {
             filePath.mkdirs();
         }
-        return new FileInputStream(new File(fileDir));
+        return new FileInputStream(fileDir.concat(fileName));
     }
 
     public String formatterYYYYMM(LocalDate date) {
@@ -186,13 +187,17 @@ public class StoreManagementUtils {
         Integer price = (Integer) unitPrice;
         Integer amount = (Integer) quantity;
 
+        if (productName.isEmpty() || customer.isEmpty()) {
+            throw new NullPointerException();
+        }
+
         LocalDateTime dateTime = LocalDateTime.now();
         Map<String, String> data = new HashMap<>();
         data.put(COLUMN_VALUE_ID, formatterDateTime(dateTime));
-        data.put(COLUMN_VALUE_PRODUCT_NAME, String.valueOf(productName));
+        data.put(COLUMN_VALUE_PRODUCT_NAME, productName);
         data.put(COLUMN_VALUE_UNIT_PRICE, String.valueOf(unitPrice));
         data.put(COLUMN_VALUE_QUANTITY, String.valueOf(quantity));
-        data.put(COLUMN_VALUE_CUSTOMER, String.valueOf(customer));
+        data.put(COLUMN_VALUE_CUSTOMER, customer);
         data.put(COLUMN_VALUE_PAID, isPaid ? "Done" : "Not Yet");
         data.put(COLUMN_VALUE_TOTAL, String.valueOf(price * amount));
         return data;
