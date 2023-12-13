@@ -3,7 +3,6 @@ package org.production.common;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.CellReference;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -12,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.production.common.Constant.*;
@@ -102,34 +102,55 @@ public class StoreManagementUtils {
         return cellStyle;
     }
 
-    public void writeRevenue(Sheet sheet, int rowIndex, Row row) {
+    public void writeRevenue(Sheet sheet, int rowIndex, Row row, Map<String, String> data, int dailyRevenue, int debtOld) {
 
-        String colTotal = CellReference.convertNumToColString(COLUMN_INDEX_TOTAL);
+        Cell cellRevenue = sheet.getRow(1).getCell(COLUMN_INDEX_DAILY_REVENUE);
+        Cell cellDebt = sheet.getRow(1).getCell(COLUMN_INDEX_DEBT);
+        Cell cellRealIncome = sheet.getRow(1).getCell(COLUMN_INDEX_REAL_INCOME);
 
-        Cell cell = sheet.getRow(1).getCell(COLUMN_INDEX_DAILY_REVENUE);
-
-        if (cell == null) {
-            cell = row.createCell(COLUMN_INDEX_DAILY_REVENUE, CellType.FORMULA);
+        if (cellRevenue == null) {
+            cellRevenue = row.createCell(COLUMN_INDEX_DAILY_REVENUE);
         }
 
-        cell.setCellFormula("SUM(" + colTotal + "2:" + colTotal + ++rowIndex + ")");
+        if (cellDebt == null) {
+            cellDebt = row.createCell(COLUMN_INDEX_DEBT);
+        }
+
+        if (cellRealIncome == null) {
+            cellRealIncome = row.createCell(COLUMN_INDEX_REAL_INCOME);
+        }
+
+        int total = Integer.parseInt(data.get(COLUMN_VALUE_TOTAL));
+        cellRevenue.setCellValue(dailyRevenue + total);
+
+        int debt = DONE.equalsIgnoreCase(data.get(COLUMN_VALUE_PAID)) ? 0 : Integer.parseInt(data.get(COLUMN_VALUE_TOTAL));
+        cellDebt.setCellValue(debtOld + debt);
+
+        cellRealIncome.setCellValue((dailyRevenue + total) - (debtOld + debt));
 
         CellStyle cellStyle = createStyleForHeader(sheet);
         cellStyle.setFillForegroundColor(IndexedColors.ROSE.getIndex());
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setBorderRight(BorderStyle.NONE);
+        cellStyle.setBorderLeft(BorderStyle.NONE);
         DataFormat format = sheet.getWorkbook().createDataFormat();
         cellStyle.setDataFormat(format.getFormat("#,###"));
-        cell.setCellStyle(cellStyle);
+        cellRevenue.setCellStyle(cellStyle);
+        cellDebt.setCellStyle(cellStyle);
+        cellRealIncome.setCellStyle(cellStyle);
 
-        if (sheet.getMergedRegions() != null) {
-            sheet.removeMergedRegion(sheet.getNumMergedRegions());
+        if (!sheet.getMergedRegions().isEmpty()) {
+            for (int i = 0; i < sheet.getNumMergedRegions();) {
+                sheet.removeMergedRegion(i);
+            }
         }
 
-        if (--rowIndex > 1) {
+        if (rowIndex > 1) {
             sheet.addMergedRegion(new CellRangeAddress(1, rowIndex, COLUMN_INDEX_DAILY_REVENUE,
                     COLUMN_INDEX_DAILY_REVENUE));
+            sheet.addMergedRegion(new CellRangeAddress(1, rowIndex, COLUMN_INDEX_DEBT, COLUMN_INDEX_DEBT));
+            sheet.addMergedRegion(new CellRangeAddress(1, rowIndex, COLUMN_INDEX_REAL_INCOME, COLUMN_INDEX_REAL_INCOME));
         }
     }
 
@@ -172,6 +193,14 @@ public class StoreManagementUtils {
         cell = row.createCell(COLUMN_INDEX_DAILY_REVENUE);
         cell.setCellStyle(cellStyle);
         cell.setCellValue(COLUMN_VALUE_DAILY_REVENUE);
+
+        cell = row.createCell(COLUMN_INDEX_DEBT);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(COLUMN_VALUE_DEBT);
+
+        cell = row.createCell(COLUMN_INDEX_REAL_INCOME);
+        cell.setCellStyle(cellStyle);
+        cell.setCellValue(COLUMN_VALUE_REAL_INCOME);
     }
 
     // Auto resize column width
@@ -238,6 +267,27 @@ public class StoreManagementUtils {
         cell = row.createCell(COLUMN_INDEX_PAID);
         cell.setCellStyle(cellStyle);
         cell.setCellValue(data.get(COLUMN_VALUE_PAID));
+    }
+
+    public void writeFileUtil(Sheet sheet, Map<String, String> data) {
+        int rowIndex = 0;
+        int dailyRevenue = 0;
+        int debt = 0;
+
+        for (Row cells : sheet) {
+            if (cells.getRowNum() == 0) {
+                rowIndex++;
+                continue;
+            }
+            dailyRevenue += (int) cells.getCell(COLUMN_INDEX_TOTAL).getNumericCellValue();
+            debt += DONE.equalsIgnoreCase(cells.getCell(COLUMN_INDEX_PAID).getStringCellValue())
+                    ? 0 : (int) cells.getCell(COLUMN_INDEX_TOTAL).getNumericCellValue();
+            rowIndex++;
+        }
+        Row row = sheet.createRow(rowIndex);
+        writeDailyRevenue(data, sheet, row);
+        writeRevenue(sheet, rowIndex, row, data, dailyRevenue, debt);
+        autosizeColumn(sheet);
     }
 }
 

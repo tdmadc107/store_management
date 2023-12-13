@@ -16,6 +16,7 @@ public class Constant {
     public static final String YYYYMM = "YYYYMM";
     public static final String YYYYMMDD = "YYYYMMdd";
     public static final String YYYYMMDDhhmmss = "YYYYMMddhhmmss";
+    public static final String DONE = "Done";
     public static final int COLUMN_INDEX_ID = 0;
     public static final int COLUMN_INDEX_CUSTOMER = 1;
     public static final int COLUMN_INDEX_PRODUCT_NAME = 2;
@@ -24,6 +25,8 @@ public class Constant {
     public static final int COLUMN_INDEX_TOTAL = 5;
     public static final int COLUMN_INDEX_PAID = 6;
     public static final int COLUMN_INDEX_DAILY_REVENUE = 7;
+    public static final int COLUMN_INDEX_DEBT = 8;
+    public static final int COLUMN_INDEX_REAL_INCOME = 9;
     public static final String COLUMN_VALUE_ID = "Id";
     public static final String COLUMN_VALUE_CUSTOMER = "Khách hàng";
     public static final String COLUMN_VALUE_PRODUCT_NAME = "Tên sản phẩm";
@@ -32,4 +35,6 @@ public class Constant {
     public static final String COLUMN_VALUE_TOTAL = "Thành tiền";
     public static final String COLUMN_VALUE_DAILY_REVENUE = "Doanh thu trong ngày";
     public static final String COLUMN_VALUE_PAID = "Trạng thái thanh toán";
+    public static final String COLUMN_VALUE_DEBT = "Công nợ";
+    public static final String COLUMN_VALUE_REAL_INCOME = "Thực thu trong ngày";
 }
