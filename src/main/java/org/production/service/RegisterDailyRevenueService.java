@@ -1,17 +1,15 @@
 package org.production.service;
 
 import lombok.Data;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.production.common.StoreManagementUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 @Service
@@ -21,34 +19,23 @@ public class RegisterDailyRevenueService {
     @Autowired
     private final StoreManagementUtils storeManagementUtils;
 
-    public void execute(Workbook workbook, Map<String, String> data, String fileDir, String sheetName) throws IOException {
-        int rowIndex = 0;
+    public void execute(Component component, Workbook workbook, Map<String, String> data, String fileDir,
+                        String sheetName) throws IOException {
 
         Sheet sheet = workbook.getSheetAt(0);
         if (sheet.getSheetName().equalsIgnoreCase(sheetName)) {
             if (sheet.getPhysicalNumberOfRows() == 0) {
                 storeManagementUtils.writeHeader(sheet, 0);
             }
-            for (Row cells : sheet) {
-                rowIndex++;
-            }
-            Row row = sheet.createRow(rowIndex);
-            storeManagementUtils.writeDailyRevenue(data, sheet, row);
-            storeManagementUtils.writeRevenue(sheet,rowIndex, row);
-            storeManagementUtils.autosizeColumn(sheet);
+            storeManagementUtils.writeFileUtil(sheet, data);
         } else {
             Sheet sheetNew = workbook.createSheet(sheetName);
             workbook.setSheetOrder(sheetName, 0);
             storeManagementUtils.writeHeader(sheetNew, 0);
-            for (Row cells : sheetNew) {
-                rowIndex++;
-            }
-            Row row = sheetNew.createRow(rowIndex);
-            storeManagementUtils.writeDailyRevenue(data, sheetNew, row);
-            storeManagementUtils.writeRevenue(sheet,rowIndex, row);
-            storeManagementUtils.autosizeColumn(sheetNew);
+            storeManagementUtils.writeFileUtil(sheetNew, data);
         }
         sheet.protectSheet("admin");
         storeManagementUtils.writeFile(workbook, fileDir);
+        JOptionPane.showMessageDialog(component, "Nhập doanh thu thành công");
     }
 }
