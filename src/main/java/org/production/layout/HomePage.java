@@ -66,7 +66,7 @@ public class HomePage extends JFrame {
                     try {
                         FileInputStream file = storeManagementUtils.openFile(fileName);
                         Workbook workbookAlready = new XSSFWorkbook(file);
-                        registerDailyRevenueService.execute(enterOrderButton, workbookAlready, data, fileDir,
+                        registerDailyRevenueService.execute(homePage, workbookAlready, data, fileDir,
                                 sheetName);
                     } catch (IOException ex) {
                         isFileAlready = false;
@@ -75,14 +75,14 @@ public class HomePage extends JFrame {
                     if (!isFileAlready) {
                         Workbook workbookNew = registerMonthlyRevenueService.execute(sheetName);
                         try {
-                            registerDailyRevenueService.execute(enterOrderButton, workbookNew, data, fileDir,
+                            registerDailyRevenueService.execute(homePage, workbookNew, data, fileDir,
                                     sheetName);
                         } catch (IOException ex) {
-                            JOptionPane.showMessageDialog(enterOrderButton, ex.getMessage());
+                            JOptionPane.showMessageDialog(homePage, ex.getMessage());
                         }
                     }
                 } catch (NullPointerException exception) {
-                    JOptionPane.showMessageDialog(enterOrderButton, "Vui lòng nhập đầy đủ tất cả các mục !!!");
+                    JOptionPane.showMessageDialog(homePage, "Vui lòng nhập đầy đủ tất cả các mục !!!");
                 }
             }
         });

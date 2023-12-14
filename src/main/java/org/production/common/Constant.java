@@ -8,7 +8,6 @@ public class Constant {
     public static final Integer WIDTH = 805;
     public static final Integer HEIGHT = 430;
     public static final Boolean TRUE = true;
-    public static final Boolean FALSE = false;
     public static final String LOCATION_FILE_REVENUE = "D:/Store/Daily_Revenue/";
     public static final LocalDate CURRENT_DATE = LocalDate.now();
     public static final String FILE_NAME = "Daily_Revenue_";

@@ -120,12 +120,13 @@ public class StoreManagementUtils {
         }
 
         int total = Integer.parseInt(data.get(COLUMN_VALUE_TOTAL));
-        cellRevenue.setCellValue(dailyRevenue + total);
+        cellRevenue.setCellValue(dailyRevenue + total == 0 ? "0" : String.valueOf(dailyRevenue + total));
 
         int debt = DONE.equalsIgnoreCase(data.get(COLUMN_VALUE_PAID)) ? 0 : Integer.parseInt(data.get(COLUMN_VALUE_TOTAL));
-        cellDebt.setCellValue(debtOld + debt);
+        cellDebt.setCellValue(debtOld + debt == 0 ? "0" : String.valueOf(debtOld + debt));
 
-        cellRealIncome.setCellValue((dailyRevenue + total) - (debtOld + debt));
+        cellRealIncome.setCellValue((dailyRevenue + total) - (debtOld + debt) == 0
+                ? "0" : String.valueOf((dailyRevenue + total) - (debtOld + debt)));
 
         CellStyle cellStyle = createStyleForHeader(sheet);
         cellStyle.setFillForegroundColor(IndexedColors.ROSE.getIndex());
@@ -133,6 +134,7 @@ public class StoreManagementUtils {
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setBorderRight(BorderStyle.NONE);
         cellStyle.setBorderLeft(BorderStyle.NONE);
+        cellStyle.setShrinkToFit(true);
         DataFormat format = sheet.getWorkbook().createDataFormat();
         cellStyle.setDataFormat(format.getFormat("#,###"));
         cellRevenue.setCellStyle(cellStyle);
@@ -140,7 +142,7 @@ public class StoreManagementUtils {
         cellRealIncome.setCellStyle(cellStyle);
 
         if (!sheet.getMergedRegions().isEmpty()) {
-            for (int i = 0; i < sheet.getNumMergedRegions();) {
+            for (int i = 0; i < sheet.getNumMergedRegions(); ) {
                 sheet.removeMergedRegion(i);
             }
         }
